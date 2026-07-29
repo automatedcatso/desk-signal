@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07111f">
+  <title>{% block title %}Notice Studio — Signal Desk{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body data-app-base="{{ request.script_root }}">
+  <div id="app-overlay" class="app-overlay d-none" role="status" aria-live="polite">
+    <div class="overlay-card">
+      <div class="spinner-border"></div>
+      <div id="overlay-text" class="overlay-text">Working…</div>
+    </div>
+  </div>
+
+  <nav class="studio-navbar fixed-top">
+    <div class="studio-navbar-left">
+      <a class="back-link" href="/"><i class="bi bi-grid"></i><span>Signal Desk</span></a>
+      <span class="nav-divider"></span>
+      <div class="product-mark"><span></span></div>
+      <div>
+        <div class="product-name">Notice Studio</div>
+        <div class="product-caption">Spreadsheet to send-ready drafts</div>
+      </div>
+    </div>
+    <div class="studio-navbar-actions">
+      <a class="tool-switch" href="/investigations/"><i class="bi bi-diagram-3"></i> Investigation Engine</a>
+      <button id="btn-clear-session" class="btn-quiet"><i class="bi bi-trash3"></i> Clear</button>
+      <button id="btn-zip-top" class="btn-accent d-none"><i class="bi bi-download"></i> Build pack</button>
+    </div>
+  </nav>
+
+  <div class="studio-layout">
+    <aside class="studio-sidebar" id="portal-sidebar">
+      {% block sidebar %}{% endblock %}
+    </aside>
+    <main class="studio-main">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  {% block drawer %}{% endblock %}
+  <script>
+    window.APP_BASE = {{ request.script_root | tojson }};
+  </script>
+  <script src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

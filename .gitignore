@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.vercel/
+.env
+.env.local
+apps/notice-studio/instance/
+apps/investigation-engine/instance/
+work/
+*.log

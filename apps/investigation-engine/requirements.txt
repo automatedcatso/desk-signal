@@ -1,0 +1,29 @@
+# Investigation Intelligence Engine - lightweight, offline-only deps.
+# Reuses the portal's shared .venv. Flask + flask-cors already ship with the
+# AI assistant module, so no new heavy dependencies are introduced there.
+Flask>=2.3
+flask-cors>=4.0
+
+# --- Optional, fully-offline evidence extraction ------------------------
+# These enable real text/metadata extraction for PDF, Office documents and
+# images (OCR). They are imported LAZILY by app/pipeline/extractors.py and the
+# pipeline degrades gracefully to empty text if any are missing, so they are
+# optional - install them to get full extraction. No network is used.
+#
+# Image OCR prefers RapidOCR + ONNX Runtime, the same local OCR stack used by
+# the AI Assistant. Tesseract is only a fallback when installed.
+pypdf>=4.0            # PDF text + document metadata
+PyMuPDF>=1.23         # rasterise scanned PDF pages for OCR (module: fitz)
+python-docx>=1.1      # .docx text + core properties
+openpyxl>=3.1         # .xlsx cell text + properties
+python-pptx>=0.6      # .pptx slide text + properties
+Pillow>=10.0          # image decode + EXIF/GPS metadata
+pytesseract>=0.3.10   # OCR wrapper around local Tesseract
+
+# Optional QR decoding for image evidence. Requires local zbar runtime when used.
+# pyzbar>=0.1.9
+
+# Shared offline OCR engine used for screenshot evidence.
+rapidocr>=2.0.0
+onnxruntime>=1.17
+numpy>=1.26

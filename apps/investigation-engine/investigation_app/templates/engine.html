@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en" data-app-base="{{ request.script_root }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07111f">
+  <title>Investigation Engine — Signal Desk</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/engine.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/workspace.css') }}">
+</head>
+<body>
+  <header class="iie-topbar">
+    <div class="iie-brand-row">
+      <a class="iie-back" href="/"><span class="iie-grid-icon">••<br>••</span> Signal Desk</a>
+      <span class="iie-divider"></span>
+      <span class="iie-product-icon"><i></i><b></b></span>
+      <div>
+        <strong>Investigation Engine</strong>
+        <small>Private evidence workspace</small>
+      </div>
+    </div>
+    <div class="iie-top-actions">
+      <a class="iie-switch" href="/notices/">Notice Studio</a>
+      <span class="iie-local"><i></i> Local-first</span>
+    </div>
+  </header>
+
+  <main class="iie-shell">
+    <section class="iie-hero">
+      <div class="iie-hero-copy">
+        <span class="iie-kicker">EVIDENCE WORKSPACE</span>
+        <h1>Find the signal<br>inside <em>every file.</em></h1>
+        <p>Import mixed evidence, surface entities and transactions, connect repeated indicators, and build a structured report from one private workspace.</p>
+      </div>
+      <div class="iie-case-control">
+        <label for="casePicker">Active investigation</label>
+        <select id="casePicker" class="iie-select"><option value="">Select investigation…</option></select>
+        <div>
+          <button class="iie-btn primary" id="caseNewBtn">Create new</button>
+          <button class="iie-btn danger" id="caseCloseBtn" title="Permanently clear and close the selected investigation" disabled>Close</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="iie-stats" id="heroStats">
+      <div class="iie-stat"><span class="l">Active investigations</span><strong class="k" id="sActive">0</strong></div>
+      <div class="iie-stat"><span class="l">Evidence items</span><strong class="k" id="sEvidence">0</strong></div>
+      <div class="iie-stat"><span class="l">Pending tasks</span><strong class="k" id="sTasks">0</strong></div>
+      <div class="iie-stat accent"><span class="l">Local storage</span><strong class="k" id="sStorage">0 B</strong></div>
+    </section>
+
+    <section class="iie-guided" id="guided">
+      <div>
+        <span>QUICK START</span>
+        <h3>From files to a clear brief</h3>
+      </div>
+      <ol>
+        <li><b>01</b>Create or choose an investigation.</li>
+        <li><b>02</b>Import files from the Evidence tab.</li>
+        <li><b>03</b>Review extracted entities, transactions, indicators and timelines.</li>
+        <li><b>04</b>Connect similar evidence and repeated values.</li>
+        <li><b>05</b>Export a share-ready report.</li>
+      </ol>
+      <button class="hide" id="guidedHide">Hide guide</button>
+    </section>
+
+    <nav class="iie-tabs" aria-label="Investigation workspace sections">
+      <button class="iie-tab active" id="tab-overview">Overview</button>
+      <button class="iie-tab" id="tab-evidence">Evidence</button>
+      <button class="iie-tab" id="tab-analysis">Analysis</button>
+      <button class="iie-tab" id="tab-search">Search</button>
+      <button class="iie-tab" id="tab-report">Report</button>
+    </nav>
+
+    <section class="iie-workspace">
+      <div class="iie-pane" id="pane-overview">
+        <div class="iie-empty-state">
+          <span class="iie-empty-mark"><i></i><b></b><em></em></span>
+          <h2>Your analysis starts here.</h2>
+          <p>Select an investigation above, or create a new one. Evidence, extracted intelligence, search and exports stay organized under that investigation.</p>
+        </div>
+      </div>
+
+      <div class="iie-pane" id="pane-evidence" style="display:none">
+        <div class="iie-pane-head">
+          <div><span>INPUT</span><h2>Evidence intake</h2></div>
+          <p>Files are scanned as data and are never executed.</p>
+        </div>
+        <div class="iie-upload-bar">
+          <input type="file" id="evUpload" class="iie-input" multiple>
+          <button class="iie-btn primary" id="evUploadBtn">Import evidence</button>
+          <button class="iie-btn" id="evReprocessAllBtn" title="Run extraction again for existing files">Reprocess all</button>
+        </div>
+        <p class="iie-muted iie-inline-help">Supports PDFs, Office files, images/OCR, email, CSV, code, configs, logs, Markdown, HTML/XML, archives and unknown text-like files.</p>
+        <div class="iie-selected-file" id="evSelectedFile" aria-live="polite" style="display:none"></div>
+        <div class="iie-evidence-loading" id="evLoadingStatus" aria-live="polite" role="status" style="display:none">
+          <div class="iie-evidence-loading-head">
+            <span id="evLoadingText">Loading evidence…</span>
+            <span class="iie-evidence-loading-pct" id="evLoadingPct"></span>
+          </div>
+          <div class="iie-evidence-progress" aria-hidden="true"><div class="iie-evidence-progress-bar" id="evLoadingBar"></div></div>
+        </div>
+        <div class="iie-list"></div>
+      </div>
+
+      <div class="iie-pane" id="pane-analysis" style="display:none">
+        <div class="iie-analysis-shell">
+          <main class="iie-analysis-main">
+            <div class="iie-analysis-head">
+              <div>
+                <span>OUTPUT</span>
+                <h2>Analysis surface</h2>
+                <p class="iie-muted" id="analysisHint">Structured intelligence, similarity, timelines and AI-ready context.</p>
+              </div>
+              <button class="iie-btn" id="analysisRefresh">Refresh</button>
+            </div>
+            <div class="iie-analysis-out" id="analysisOut">Select an investigation, then choose an analysis view.</div>
+          </main>
+          <aside class="iie-analysis-tabs" aria-label="Analysis sections">
+            <button class="iie-atab active" data-analysis-tab="summary">Summary</button>
+            <button class="iie-atab" data-analysis-tab="evidence">Evidence</button>
+            <button class="iie-atab" data-analysis-tab="entities">Entities</button>
+            <button class="iie-atab" data-analysis-tab="transactions">Transactions</button>
+            <button class="iie-atab" data-analysis-tab="messages">Messages</button>
+            <button class="iie-atab" data-analysis-tab="social">Social profiles</button>
+            <button class="iie-atab" data-analysis-tab="timeline">Timeline</button>
+            <button class="iie-atab" data-analysis-tab="technical">Technical indicators</button>
+            <button class="iie-atab" data-analysis-tab="duplicates">Duplicates</button>
+            <button class="iie-atab" data-analysis-tab="similar">Similar evidence</button>
+            <button class="iie-atab" data-analysis-tab="relationships">Relationships</button>
+            <button class="iie-atab" data-analysis-tab="ai">AI analysis</button>
+            <button class="iie-atab" data-analysis-tab="export">Export</button>
+          </aside>
+        </div>
+      </div>
+
+      <div class="iie-pane" id="pane-search" style="display:none">
+        <div class="iie-pane-head">
+          <div><span>LOOKUP</span><h2>Search every item</h2></div>
+          <p>Full-text search across the active investigation.</p>
+        </div>
+        <div class="iie-field">
+          <input type="text" id="searchInput" class="iie-input" placeholder="Search names, accounts, URLs, transaction IDs…">
+          <button class="iie-btn primary" id="searchBtn">Search</button>
+        </div>
+        <div class="iie-list" id="searchResults"></div>
+      </div>
+
+      <div class="iie-pane" id="pane-report" style="display:none">
+        <div class="iie-pane-head">
+          <div><span>DELIVERABLE</span><h2>Build a report</h2></div>
+          <p>Create a focused summary and export it in the format you need.</p>
+        </div>
+        <div class="iie-field">
+          <select id="reportKind" class="iie-select">
+            <option value="investigation">Full investigation</option>
+            <option value="evidence">Evidence summary</option>
+            <option value="entity">Entity summary</option>
+            <option value="timeline">Timeline summary</option>
+          </select>
+          <button class="iie-btn primary" id="reportBtn">Generate report</button>
+          <span class="iie-export-links" id="reportExportLinks"></span>
+        </div>
+        <div class="iie-report-out" id="reportOut"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>window.IIE_BASE = {{ request.script_root | tojson }};</script>
+  <script src="{{ url_for('static', filename='js/workspace.js') }}"></script>
+</body>
+</html>

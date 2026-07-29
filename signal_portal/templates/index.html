@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07111f">
+  <title>Signal Desk — Local analysis workspace</title>
+  <meta name="description" content="A private local workspace for notice generation and evidence analysis.">
+  <link rel="stylesheet" href="{{ url_for('static', filename='portal.css') }}">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Signal Desk home">
+      <span class="brand-mark"><span></span><span></span><span></span></span>
+      <span>Signal Desk</span>
+    </a>
+    <div class="local-pill"><span></span> Local-first workspace</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">PRIVATE OPERATIONS SUITE</div>
+      <h1>Turn raw records into<br><em>clear next steps.</em></h1>
+      <p>Two focused tools, one calm workspace. Import spreadsheets, prepare email-ready notices, and analyze mixed evidence with local processing by default.</p>
+      <div class="privacy-note">
+        <span class="privacy-icon">◎</span>
+        <div><strong>You control where analysis runs.</strong><br>Local storage and deterministic analysis are the defaults; Gemini is an explicit opt-in.</div>
+      </div>
+    </section>
+
+    <section class="tool-grid" aria-label="Signal Desk tools">
+      <article class="tool-card mint">
+        <div class="card-top">
+          <span class="tool-index">01</span>
+          <span class="tool-status">READY</span>
+        </div>
+        <div class="tool-symbol" aria-hidden="true">
+          <span class="sheet-line"></span><span class="sheet-line short"></span>
+          <span class="sheet-dot"></span>
+        </div>
+        <div>
+          <p class="tool-kicker">Spreadsheet workflow</p>
+          <h2>Notice Studio</h2>
+          <p>Import an XLSX, validate transaction rows, review simple notices, then download DOCX files and ready-to-send email drafts in one organized ZIP.</p>
+        </div>
+        <div class="feature-row">
+          <span>XLSX import</span><span>Live preview</span><span>EML + DOCX</span>
+        </div>
+        <a class="launch-button" href="/notices/">
+          Open Notice Studio <span>↗</span>
+        </a>
+      </article>
+
+      <article class="tool-card violet">
+        <div class="card-top">
+          <span class="tool-index">02</span>
+          <span class="tool-status">LOCAL-FIRST</span>
+        </div>
+        <div class="tool-symbol orbit" aria-hidden="true">
+          <span class="orbit-core"></span><span class="orbit-ring"></span>
+          <span class="orbit-node"></span>
+        </div>
+        <div>
+          <p class="tool-kicker">Evidence workspace</p>
+          <h2>Investigation Engine</h2>
+          <p>Organize files, extract entities and transactions, search every item, map relationships, build a timeline, and export a structured report.</p>
+        </div>
+        <div class="feature-row">
+          <span>Mixed files</span><span>Relationships</span><span>Reports</span>
+        </div>
+        <a class="launch-button" href="/investigations/">
+          Open Investigation Engine <span>↗</span>
+        </a>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <span>Signal Desk</span>
+    <span>Built for private, deliberate work.</span>
+    <span>v1.1</span>
+  </footer>
+</body>
+</html>

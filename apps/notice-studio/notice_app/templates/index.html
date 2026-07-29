@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% block title %}Notice Studio — Signal Desk{% endblock %}
+
+{% block sidebar %}
+  <div class="sidebar-intro">
+    <span class="sidebar-kicker">DELIVERY SETTINGS</span>
+    <h2>Finish once.<br>Apply everywhere.</h2>
+    <p>These optional sender details are used for every draft unless a row overrides them.</p>
+  </div>
+
+  <div class="filter-section">
+    <label class="form-label">Sender role</label>
+    <select id="global-sender-role" class="form-select">
+      <option value="">Select a role…</option>
+      {% for role in sender_roles %}
+      <option value="{{ role }}">{{ role }}</option>
+      {% endfor %}
+    </select>
+    <div id="global-sender-wrap" class="mt-3">
+      <label class="form-label">Sender name</label>
+      <input id="global-sender-name" type="text" class="form-control" placeholder="Optional name">
+    </div>
+    <button id="save-signatory" class="sidebar-save mt-3">Save sender details</button>
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-title">Layers</div>
+    <div id="layer-filters"><div class="empty-filter">Import a workbook to begin.</div></div>
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-title">Companies <span id="bank-layer-hint"></span></div>
+    <div id="bank-filters"><div class="empty-filter">Choose a layer.</div></div>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <section id="view-upload" {% if has_session %}class="d-none"{% endif %}>
+    <div class="upload-heading">
+      <div>
+        <span class="section-kicker">NEW NOTICE PACK</span>
+        <h1>Start with your<br><em>transaction sheet.</em></h1>
+        <p>Drop in one XLSX. Signal Desk maps the columns, validates each row, and creates a review queue before anything is generated.</p>
+      </div>
+      <div class="format-note">
+        <strong>Required columns</strong>
+        <div class="format-chips">
+          <span>Bank</span><span>Layer</span><span>Account No</span>
+          <span>IFSC</span><span>Transaction Amount</span>
+        </div>
+        <small>Optional: Company Email creates addressed email drafts automatically.</small>
+      </div>
+    </div>
+    <div id="dropzone" class="dropzone">
+      <div class="drop-icon"><i class="bi bi-file-earmark-spreadsheet"></i></div>
+      <h3>Drop an Excel workbook here</h3>
+      <p>or choose a local .xlsx file</p>
+      <button class="choose-file" id="choose-file">Browse files</button>
+      <input type="file" id="file-input" accept=".xlsx" hidden>
+      <div class="local-only"><span></span> Processed locally in this workspace</div>
+    </div>
+    <div id="upload-error" class="alert alert-danger mt-3 d-none"></div>
+  </section>
+
+  <section id="view-workspace" {% if not has_session %}class="d-none"{% endif %}>
+    <div class="workspace-head">
+      <div>
+        <span class="section-kicker">ACTIVE WORKBOOK</span>
+        <h1>Notice queue</h1>
+      </div>
+      <p>Review names and recipients, then build one organized delivery pack.</p>
+    </div>
+
+    <div class="stat-grid" id="stat-cards">
+      <div class="stat-card"><span class="stat-label">Rows</span><strong id="st-total">0</strong></div>
+      <div class="stat-card"><span class="stat-label">Companies</span><strong id="st-banks">0</strong></div>
+      <div class="stat-card"><span class="stat-label">Layers</span><strong id="st-layers">0</strong></div>
+      <div class="stat-card"><span class="stat-label">Total value</span><strong id="st-amount">0</strong></div>
+      <div class="stat-card"><span class="stat-label">Email ready</span><strong id="st-email">0</strong></div>
+      <div class="stat-card accent"><span class="stat-label">Notices ready</span><strong id="st-ready">0</strong></div>
+    </div>
+
+    <div class="completion-card">
+      <div><span>Completion</span><strong id="st-completion-txt">0 / 0 complete</strong></div>
+      <div class="progress progress-thin"><div id="completion-bar" class="progress-bar"></div></div>
+    </div>
+
+    <div class="sticky-toolbar">
+      <div class="search-bar">
+        <i class="bi bi-search"></i>
+        <input id="search-input" placeholder="Search account, reference, company, email, IFSC…">
+      </div>
+      <button id="btn-bulk-name" class="toolbar-button" disabled><i class="bi bi-type"></i> Bulk reference</button>
+      <button id="btn-error-report" class="toolbar-button"><i class="bi bi-exclamation-diamond"></i> Issues</button>
+      <button id="btn-generate-selected" class="toolbar-button" disabled><i class="bi bi-check2-square"></i> Selected</button>
+      <button id="btn-generate-all" class="toolbar-button primary" disabled><i class="bi bi-box-arrow-down"></i> Build pack</button>
+      <div class="filter-chips" id="filter-chips"></div>
+    </div>
+
+    <div class="record-table">
+      <table class="table mb-0 align-middle">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="select-all" aria-label="Select visible rows"></th>
+            <th data-sort="account_no">Account</th>
+            <th data-sort="reference_name">Reference</th>
+            <th data-sort="bank">Company</th>
+            <th data-sort="company_email">Email</th>
+            <th data-sort="layer">Layer</th>
+            <th data-sort="transaction_amount">Amount</th>
+            <th data-sort="status">Status</th>
+            <th><span class="visually-hidden">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody id="record-body"></tbody>
+      </table>
+    </div>
+
+    <nav class="page-bar">
+      <span id="page-info"></span>
+      <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+    </nav>
+  </section>
+{% endblock %}
+
+{% block drawer %}
+<div class="notice-drawer" id="notice-drawer" aria-label="Notice editor">
+  <div class="drawer-header">
+    <div><span>NOTICE EDITOR</span><h2>Review draft</h2></div>
+    <button class="drawer-close" id="drawer-close" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-fields">
+      <div>
+        <label class="form-label">Reference name <span>*</span></label>
+        <input id="drawer-reference" class="form-control" placeholder="Name for this reference">
+      </div>
+      <div>
+        <label class="form-label">Company email</label>
+        <input id="drawer-company-email" type="email" class="form-control" placeholder="compliance@company.com">
+      </div>
+      <div>
+        <label class="form-label">Sender role</label>
+        <select id="drawer-sender-role" class="form-select">
+          <option value="">Use global role</option>
+          {% for role in sender_roles %}<option value="{{ role }}">{{ role }}</option>{% endfor %}
+        </select>
+      </div>
+      <div id="drawer-sender-wrap">
+        <label class="form-label">Sender name</label>
+        <input id="drawer-sender" class="form-control" placeholder="Use global name">
+      </div>
+    </div>
+
+    <div class="detail-grid" id="detail-grid"></div>
+
+    <div class="preview-toolbar">
+      <span>Document preview</span>
+      <div>
+        <button class="zoom-btn" data-zoom="1">100%</button>
+        <button class="zoom-btn" data-zoom="1.2">120%</button>
+        <button class="zoom-btn" data-zoom="1.4">140%</button>
+      </div>
+    </div>
+    <div id="preview-wrap"><div class="notice-preview" id="notice-preview"></div></div>
+  </div>
+  <div class="drawer-footer">
+    <div>
+      <button class="drawer-nav" id="drawer-prev"><i class="bi bi-arrow-left"></i> Previous</button>
+      <button class="drawer-nav" id="drawer-next">Next <i class="bi bi-arrow-right"></i></button>
+    </div>
+    <div>
+      <button class="drawer-nav" id="drawer-cancel">Cancel</button>
+      <button class="drawer-save" id="drawer-save">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="complete-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content signal-modal">
+      <div class="modal-header"><div><span>QUEUE COMPLETE</span><h5 class="modal-title">Ready to build</h5></div></div>
+      <div class="modal-body"><p id="complete-modal-text">Every notice is ready. Build the delivery pack now?</p></div>
+      <div class="modal-footer">
+        <button class="toolbar-button" data-bs-dismiss="modal">Not now</button>
+        <button class="toolbar-button primary" id="modal-generate">Build pack</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="progress-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content signal-modal">
+      <div class="modal-header"><div><span>DELIVERY PACK</span><h5 class="modal-title" id="progress-title">Preparing files</h5></div></div>
+      <div class="modal-body">
+        <div class="progress mb-3"><div id="gen-bar" class="progress-bar progress-bar-striped progress-bar-animated"></div></div>
+        <p id="gen-status">Starting…</p>
+        <div id="gen-summary" class="generation-summary d-none">
+          <div><strong id="sum-generated">0</strong><span>Notices</span></div>
+          <div><strong id="sum-emails">0</strong><span>Email drafts</span></div>
+          <div><strong id="sum-missing-email">0</strong><span>Need recipient</span></div>
+          <div><strong id="sum-errored">0</strong><span>Errors</span></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="toolbar-button" data-bs-dismiss="modal" id="progress-close">Close</button>
+        <a class="toolbar-button primary d-none" id="gen-download"><i class="bi bi-download"></i> Download ZIP</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.APP_CONFIG = {
+    unsignedRole: {{ unsigned_role | tojson }}
+  };
+</script>
+<script src="{{ url_for('static', filename='js/api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}

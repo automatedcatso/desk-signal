@@ -1,0 +1,19 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Runtime instance data (recreated automatically at startup)
+instance/*.db
+instance/logs/
+instance/output/
+instance/uploads/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db

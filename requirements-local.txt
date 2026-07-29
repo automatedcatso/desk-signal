@@ -1,0 +1,9 @@
+-r requirements.txt
+
+# Optional local-only extraction extras. The engine degrades gracefully when
+# these are omitted, which keeps the Vercel package lightweight.
+PyMuPDF>=1.23
+pytesseract>=0.3.10
+rapidocr>=2.0.0
+onnxruntime>=1.17
+numpy>=1.26
