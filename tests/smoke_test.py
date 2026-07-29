@@ -33,6 +33,14 @@ from portal import app  # noqa: E402
 
 client = Client(app, Response)
 
+# Flask's own instance directory must share the configured writable runtime.
+# This prevents serverless deployments from trying to create files inside the
+# read-only source bundle during application startup.
+notice_app = app.mounts["/notices"]
+assert os.path.normcase(os.path.abspath(notice_app.instance_path)) == os.path.normcase(
+    os.path.abspath(os.path.join(RUNTIME, "notice-studio"))
+)
+
 
 def expect(response, status=200):
     assert response.status_code == status, (

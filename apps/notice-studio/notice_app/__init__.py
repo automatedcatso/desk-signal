@@ -25,7 +25,16 @@ def _configure_logging(app: Flask) -> None:
 
 
 def create_app(config_class: type = Config) -> Flask:
-    app = Flask(__name__, instance_relative_config=True)
+    # Vercel's deployed source bundle is read-only. Point Flask's own instance
+    # directory at the same writable runtime location as uploads and SQLite.
+    instance_path = os.path.abspath(
+        getattr(config_class, "INSTANCE_PATH", Config.INSTANCE_PATH)
+    )
+    app = Flask(
+        __name__,
+        instance_relative_config=True,
+        instance_path=instance_path,
+    )
     app.config.from_object(config_class)
 
     os.makedirs(app.instance_path, exist_ok=True)

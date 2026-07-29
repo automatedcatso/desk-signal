@@ -19,6 +19,7 @@ INSTANCE_DIR = _runtime_dir()
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "change-me-in-production")
+    INSTANCE_PATH = INSTANCE_DIR
 
     # SQLite keeps imported work across refresh and scales past 5,000 records.
     SQLALCHEMY_DATABASE_URI = os.environ.get(
