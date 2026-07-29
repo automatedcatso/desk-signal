@@ -272,7 +272,4 @@ requests.
 Use `LINKEDIN_README.md` for prepared LinkedIn copy and media order. Use
 `PUBLISHING_GUIDE.md` for the GitHub, Vercel and LinkedIn release checklist.
 
-## License
 
-No public license is selected in this package. Add the license that matches
-your intended distribution before making the repository public.
