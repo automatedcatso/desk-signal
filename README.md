@@ -264,12 +264,3 @@ python tests/test_gemini_adapter.py
 python tests/smoke_test.py
 ```
 
-The GitHub Actions workflow runs the same core checks on pushes and pull
-requests.
-
-## Publishing
-
-Use `LINKEDIN_README.md` for prepared LinkedIn copy and media order. Use
-`PUBLISHING_GUIDE.md` for the GitHub, Vercel and LinkedIn release checklist.
-
-
